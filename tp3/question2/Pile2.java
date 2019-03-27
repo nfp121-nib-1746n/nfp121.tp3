@@ -11,7 +11,7 @@ public class Pile2 implements PileI {
 
     /** la capacite de la pile */
     private int capacite;
-
+    private int taille;
     /**
      * Creation d'une pile.
      * 
@@ -19,27 +19,39 @@ public class Pile2 implements PileI {
      *            la taille de la pile, la taille doit etre > 0
      */
     public Pile2(int taille) {
-        // prevoir le cas <=0
-        // a completer
+     if(taille <= 0) 
+            taille = CAPACITE_PAR_DEFAUT;
+        this.stk = new Stack<Object>();
+        this.capacite = taille;
+        this.taille = 0;
     }
 
     // constructeur fourni
     public Pile2() {
-        this(0);
+       this(CAPACITE_PAR_DEFAUT);
     }
 
     public void empiler(Object o) throws PilePleineException {
-        // a completer
+       if(!estPleine()){
+            stk.push(o);
+            taille++;
+        }
+        else throw new PilePleineException();
     }
 
     public Object depiler() throws PileVideException {
-        // a completer
-        return null;
+       if(!estVide()){
+            taille--;
+            return stk.pop();
+        }
+        else throw new PileVideException();
     }
 
     public Object sommet() throws PileVideException {
-        // a completer
-        return null;
+       if(!estVide()){
+            return stk.peek();
+        }
+        else throw new PileVideException();
     }
 
     /**
@@ -49,7 +61,7 @@ public class Pile2 implements PileI {
      */
     public boolean estVide() {
         // a completer
-        return false;
+        return taille == 0;
     }
 
     /**
@@ -59,7 +71,7 @@ public class Pile2 implements PileI {
      */
     public boolean estPleine() {
         // a completer
-        return false;
+        return taille == capacite;
     }
 
     /**
@@ -69,14 +81,81 @@ public class Pile2 implements PileI {
      * @return une representation en String d'une pile
      */
     public String toString() {
+     Pile2 pileTemp = new Pile2(capacite());
+        Object tempObject = new Object();
         String s = "[";
-        // a completer
+        while (!estVide()){
+            try{ tempObject = depiler();
+            } catch (PileVideException pve){pve.printStackTrace();}
+            s += (tempObject==null) ? "null": tempObject.toString();
+            try{pileTemp.empiler(tempObject);
+            } catch (PilePleineException ppe){ppe.printStackTrace();}
+            if(!estVide())
+                s += ", ";
+        }
+        remplirPile(pileTemp, this);
         return s + "]";
+    }
+    
+    private void remplirPile(PileI p1, PileI p2){
+        while(!p1.estVide()){
+            try{
+                p2.empiler(p1.depiler());
+            } catch (PileVideException pve){pve.printStackTrace();}
+            catch (PilePleineException ppe){ppe.printStackTrace();}
+        }
     }
 
     public boolean equals(Object o) {
-        // a completer
-        return false;
+       if(o == null) return false;
+        
+        if(!(o instanceof PileI))
+            return false;
+        PileI pile = (PileI)o;
+        
+        if(super.equals(o))
+            return true;
+        
+        int capacite = this.capacite();
+        int taille = this.taille();
+        if(capacite != pile.capacite())
+            return false;
+        if(taille != pile.taille())
+            return false;
+            
+        if(taille == 0) return true;
+        
+         Pile2 tempPile1 = new Pile2(taille);
+        Pile2 tempPile2 = new Pile2(pile.taille());
+        
+         boolean elementsEgaux;
+        
+        while (!this.estVide() && !pile.estVide()){
+            
+            try{
+                elementsEgaux = false;
+                if(this.sommet() == null){
+                    if(pile.sommet() == null) 
+                        elementsEgaux = true;
+                }        
+                else if(pile.sommet() == null){
+                    if(this.sommet() == null) 
+                        elementsEgaux = true;
+                }  
+                else if(this.sommet().equals(pile.sommet())){
+                    elementsEgaux = true;
+                }
+                
+                if(elementsEgaux){tempPile1.empiler(this.depiler());tempPile2.empiler(pile.depiler());}
+                else{ remplirPile(tempPile1, this);remplirPile(tempPile2, pile); return false; }
+              } catch(PilePleineException ppe){ppe.printStackTrace();}
+            catch(PileVideException pve){pve.printStackTrace();}
+        }
+        
+       remplirPile(tempPile1, this);
+        remplirPile(tempPile2, pile);
+        
+        return true;
     }
 
     // fonction fournie
@@ -91,7 +170,7 @@ public class Pile2 implements PileI {
      */
     public int taille() {
         // a completer
-        return 0;
+       return this.taille;
     }
 
     /**
@@ -101,7 +180,7 @@ public class Pile2 implements PileI {
      */
     public int capacite() {
         // a completer
-        return 0;
+        return this.capacite;
     }
 
 } // Pile2.java

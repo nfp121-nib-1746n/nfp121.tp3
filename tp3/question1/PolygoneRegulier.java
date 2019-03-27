@@ -6,7 +6,7 @@ public class PolygoneRegulier {
     private int longueurDuCote;
 
     /**
-     * CrÃ©ation d'un polygone rÃ©gulier
+     * Création d'un polygone régulier
      * 
      * @param nombreDeCotes
      *            (nombreDeCotes >=1 && nombreDeCotes <100)
